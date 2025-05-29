@@ -1,8 +1,50 @@
 // public/js/cars.js
 document.addEventListener('DOMContentLoaded', function() {
     const carsContainer = document.getElementById('cars-container');
+    const paginationContainer = document.getElementById('pagination-container');
     const carDetailsModal = new bootstrap.Modal(document.getElementById('carDetailsModal'));
     let allCars = [];
+    
+    // Переменные для пагинации
+    let currentPage = 1;
+    let totalCars = 0;
+    let totalPages = 0;
+    let carsPerPage = 20; // Количество автомобилей на странице
+    let currentFilters = {};
+
+    function loadFilterOptions() {
+        fetch('/api/cars/filters')
+            .then(res => res.json())
+            .then(data => {
+                // Марки
+                const makeSelect = document.getElementById('car-make');
+                makeSelect.innerHTML = '<option value="">Все марки</option>';
+                data.makes.forEach(make => {
+                    makeSelect.innerHTML += `<option value="${make}">${make}</option>`;
+                });
+
+                // Типы кузова
+                const typeSelect = document.getElementById('car-type');
+                typeSelect.innerHTML = '<option value="">Все типы</option>';
+                data.types.forEach(type => {
+                    typeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+                });
+
+                // Коробка передач
+                const transmissionSelect = document.getElementById('transmission');
+                transmissionSelect.innerHTML = '<option value="">Любая КПП</option>';
+                data.transmissions.forEach(tr => {
+                    transmissionSelect.innerHTML += `<option value="${tr}">${tr === 'automatic' ? 'Автоматическая' : 'Механическая'}</option>`;
+                });
+
+                // Годы выпуска
+                const yearSelect = document.getElementById('year');
+                yearSelect.innerHTML = '<option value="">Любой год</option>';
+                data.years.forEach(year => {
+                    yearSelect.innerHTML += `<option value="${year}">${year}</option>`;
+                });
+        });
+}
     
     // Проверка авторизации пользователя
     function checkAuth() {
@@ -48,8 +90,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Загрузка всех автомобилей
-    function loadCars(filters = {}) {
+    // Загрузка автомобилей с пагинацией
+    function loadCars(filters = {}, page = 1) {
+        currentPage = page;
+        currentFilters = filters;
+        
         carsContainer.innerHTML = `
             <div class="col-12 text-center py-5">
                 <div class="spinner-border text-primary" role="status">
@@ -59,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
-        let url = '/api/cars?';
+        let url = `/api/cars?page=${page}&limit=${carsPerPage}`;
         const params = [];
         
         if (filters.make) params.push(`make=${filters.make}`);
@@ -70,24 +115,96 @@ document.addEventListener('DOMContentLoaded', function() {
         if (filters.maxPrice) params.push(`maxPrice=${filters.maxPrice}`);
         if (filters.year) params.push(`year=${filters.year}`);
         
-        url += params.join('&');
+        if (params.length > 0) {
+            url += '&' + params.join('&');
+        }
         
         fetch(url)
             .then(response => response.json())
-            .then(cars => {
-                allCars = cars;
-                renderCars(cars);
+            .then(data => {
+                allCars = data.cars;
+                totalCars = data.total;
+                totalPages = Math.ceil(totalCars / carsPerPage);
+                
+                renderCars(data.cars);
+                renderPagination();
             })
             .catch(error => {
                 console.error('Ошибка загрузки автомобилей:', error);
                 carsContainer.innerHTML = `
                     <div class="col-12 text-center py-5">
                         <div class="alert alert-danger" role="alert">
-                            Произ��шла ошибка при загрузке автомобилей. Пожалуйста, попробуйте позже.
+                            Произошла ошибка при загрузке автомобилей. Пожалуйста, попробуйте позже.
                         </div>
                     </div>
                 `;
+                paginationContainer.innerHTML = '';
             });
+    }
+    
+    // Отображение пагинации
+    function renderPagination() {
+        if (totalPages <= 1) {
+            paginationContainer.innerHTML = '';
+            return;
+        }
+        
+        let paginationHTML = `
+            <nav aria-label="Навигация по страницам">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage - 1}" aria-label="Предыдущая">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+        `;
+        
+        // Определяем диапазон страниц для отображения
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, startPage + 4);
+        
+        if (endPage - startPage < 4) {
+            startPage = Math.max(1, endPage - 4);
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                </li>
+            `;
+        }
+        
+        paginationHTML += `
+                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage + 1}" aria-label="Следующая">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="text-center mt-2">
+                <small class="text-muted">Показано ${(currentPage - 1) * carsPerPage + 1} - ${Math.min(currentPage * carsPerPage, totalCars)} из ${totalCars} автомобилей</small>
+            </div>
+        `;
+        
+        paginationContainer.innerHTML = paginationHTML;
+        
+        // Добавляем обработчики событий для кнопок пагинации
+        document.querySelectorAll('.pagination .page-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const page = parseInt(this.getAttribute('data-page'));
+                if (page >= 1 && page <= totalPages) {
+                    loadCars(currentFilters, page);
+                    // Прокрутка к верху списка автомобилей
+                    window.scrollTo({
+                        top: document.querySelector('.cars-section').offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
     }
     
     // Отображение автомобилей на странице
@@ -231,11 +348,12 @@ document.addEventListener('DOMContentLoaded', function() {
             year: document.getElementById('year').value
         };
         
-        loadCars(filters);
+        loadCars(filters, 1); // При применении фильтров всегда начинаем с первой страницы
     });
     
     // Начальная загрузка
     checkAuth();
+    loadFilterOptions
     loadCars();
     
     // Проверка, нужно ли показать конкретный автомобиль (из параметра URL)

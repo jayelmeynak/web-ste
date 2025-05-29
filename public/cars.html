@@ -65,47 +65,20 @@
                             <div class="row">
                                 <div class="col-md-3 mb-3">
                                     <label for="car-make" class="form-label">Марка</label>
-                                    <select class="form-select" id="car-make">
-                                        <option value="">Все марки</option>
-                                        <option value="Toyota">Toyota</option>
-                                        <option value="BMW">BMW</option>
-                                        <option value="Mercedes">Mercedes</option>
-                                        <option value="Hyundai">Hyundai</option>
-                                        <option value="Kia">Kia</option>
-                                        <option value="Volkswagen">Volkswagen</option>
-                                        <option value="Audi">Audi</option>
-                                    </select>
+                                    <select class="form-select" id="car-make"></select>
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label for="car-type" class="form-label">Тип кузова</label>
-                                    <select class="form-select" id="car-type">
-                                        <option value="">Все типы</option>
-                                        <option value="economy">Эконом</option>
-                                        <option value="comfort">Комфорт</option>
-                                        <option value="premium">Премиум</option>
-                                        <option value="suv">Внедорожник</option>
-                                        <option value="minivan">Минивэн</option>
-                                    </select>
+                                    <select class="form-select" id="car-type"></select>
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label for="transmission" class="form-label">Коробка передач</label>
-                                    <select class="form-select" id="transmission">
-                                        <option value="">Любая КПП</option>
-                                        <option value="manual">Механическая</option>
-                                        <option value="automatic">Автоматическая</option>
-                                    </select>
+                                    <select class="form-select" id="transmission"></select>
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                    <label for="fuel-type" class="form-label">Тип топлива</label>
-                                    <select class="form-select" id="fuel-type">
-                                        <option value="">Любое топливо</option>
-                                        <option value="petrol">Бензин</option>
-                                        <option value="diesel">Дизель</option>
-                                        <option value="hybrid">Гибрид</option>
-                                        <option value="electric">Электро</option>
-                                    </select>
+                                    <label for="year" class="form-label">Год выпуска</label>
+                                    <select class="form-select" id="year"></select>
                                 </div>
-                            </div>
                             <div class="row">
                                 <div class="col-md-3 mb-3">
                                     <label for="min-price" class="form-label">Мин. цена (₽)</label>
@@ -142,6 +115,15 @@
                         <span class="visually-hidden">Загрузка...</span>
                     </div>
                     <p class="mt-2">Загрузка автомобилей...</p>
+                </div>
+            </div>
+            
+            <!-- Добавленный контейнер для пагинации -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div id="pagination-container">
+                        <!-- Здесь будет отображаться пагинация -->
+                    </div>
                 </div>
             </div>
         </div>

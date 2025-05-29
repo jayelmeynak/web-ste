@@ -214,6 +214,27 @@ app.post('/api/register', (req, res) => {
   });
 });
 
+app.get('/api/cars/filters', (req, res) => {
+  db.all('SELECT DISTINCT make FROM cars ORDER BY make', [], (err, makes) => {
+    if (err) return res.status(500).json({ error: 'Ошибка сервера' });
+    db.all('SELECT DISTINCT type FROM cars ORDER BY type', [], (err, types) => {
+      if (err) return res.status(500).json({ error: 'Ошибка сервера' });
+      db.all('SELECT DISTINCT transmission FROM cars ORDER BY transmission', [], (err, transmissions) => {
+        if (err) return res.status(500).json({ error: 'Ошибка сервера' });
+        db.all('SELECT DISTINCT year FROM cars ORDER BY year DESC', [], (err, years) => {
+          if (err) return res.status(500).json({ error: 'Ошибка сервера' });
+          res.json({
+            makes: makes.map(m => m.make).filter(Boolean),
+            types: types.map(t => t.type).filter(Boolean),
+            transmissions: transmissions.map(t => t.transmission).filter(Boolean),
+            years: years.map(y => y.year).filter(Boolean)
+          });
+        });
+      });
+    });
+  });
+});
+
 // API для входа пользователя
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
