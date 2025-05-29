@@ -1,0 +1,208 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>АвтоМаркет - Продажа автомобилей</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">АвтоМаркет</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cars.html">Автомобили</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">О компании</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contacts.html">Контакты</a>
+                    </li>
+                </ul>
+                <div class="d-flex" id="auth-buttons">
+                    <a href="login.html" class="btn btn-outline-light me-2">Вход</a>
+                    <a href="register.html" class="btn btn-primary">Регистрация</a>
+                </div>
+                <div class="d-none" id="user-menu">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle me-1"></i> <span id="user-name">Пользователь</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="profile.html">Мой профиль</a></li>
+                            <li><a class="dropdown-item" href="orders.html">Мои заказы</a></li>
+                            <li><a class="dropdown-item" href="test-drives.html">Мои тест-драйвы</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logout-btn">Выйти</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-section">
+        <div class="container text-center py-5">
+            <h1 class="display-4 fw-bold text-white mb-4">Продажа новых и подержанных автомобилей</h1>
+            <p class="lead text-white mb-5">Широкий выбор автомобилей по выгодным ценам</p>
+            <a href="cars.html" class="btn btn-primary btn-lg px-4 me-2">Выбрать авто</a>
+            <a href="#features" class="btn btn-outline-light btn-lg px-4">Узнать больше</a>
+        </div>
+    </header>
+
+    <section id="features" class="py-5">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-4 mb-4">
+                    <div class="feature-icon bg-primary bg-gradient p-3 rounded-circle d-inline-block mb-3">
+                        <i class="bi bi-car-front-fill text-white fs-3"></i>
+                    </div>
+                    <h3>Большой выбор</h3>
+                    <p>Более 100 моделей автомобилей разных классов и ценовых категорий</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-icon bg-primary bg-gradient p-3 rounded-circle d-inline-block mb-3">
+                        <i class="bi bi-shield-check text-white fs-3"></i>
+                    </div>
+                    <h3>Гарантия качества</h3>
+                    <p>Все автомобили проходят тщательную проверку перед продажей</p>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-icon bg-primary bg-gradient p-3 rounded-circle d-inline-block mb-3">
+                        <i class="bi bi-credit-card text-white fs-3"></i>
+                    </div>
+                    <h3>Удобная оплата</h3>
+                    <p>Возможность покупки в кредит, лизинг или рассрочку</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Популярные автомобили</h2>
+            <div class="row" id="featured-cars">
+                <!-- Автомобили будут загружены здесь -->
+            </div>
+            <div class="text-center mt-4">
+                <a href="cars.html" class="btn btn-outline-primary">Все автомобили</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <img src="https://via.placeholder.com/600x400?text=Test+Drive" alt="Тест-драйв" class="img-fluid rounded">
+                </div>
+                <div class="col-md-6">
+                    <h2 class="mb-4">Запишитесь на тест-драйв</h2>
+                    <p class="lead mb-4">Хотите убедиться, что выбранный автомобиль вам подходит? Запишитесь на бесплатный тест-драйв!</p>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Тест-драйв в удобное для вас время</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Консультация опытного специалиста</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Возможность сравнить несколько моделей</li>
+                    </ul>
+                    <a href="test-drive.html" class="btn btn-primary">Записаться на тест-драйв</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Наши преимущества</h2>
+            <div class="row">
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-currency-exchange text-primary fs-1 mb-3"></i>
+                            <h4 class="card-title">Вы��одные цены</h4>
+                            <p class="card-text">Мы предлагаем конкурентные цены на все автомобили в нашем каталоге</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-file-earmark-text text-primary fs-1 mb-3"></i>
+                            <h4 class="card-title">Юридическая чистота</h4>
+                            <p class="card-text">Гарантируем полную юридическую чистоту всех продаваемых автомобилей</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-tools text-primary fs-1 mb-3"></i>
+                            <h4 class="card-title">Сервисное обслуживание</h4>
+                            <p class="card-text">Предоставляем гарантийное и постгарантийное обслуживание</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-truck text-primary fs-1 mb-3"></i>
+                            <h4 class="card-title">Доставка</h4>
+                            <p class="card-text">Доставим ваш новый автомобиль в любой город России</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>АвтоМаркет</h5>
+                    <p>Лучший выбор автомобилей для покупки в вашем городе.</p>
+                    <div class="social-icons">
+                        <a href="#" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-youtube"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-telegram"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Контакты</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-geo-alt-fill me-2"></i> г. Москва, ул. Примерная, 123</li>
+                        <li><i class="bi bi-telephone-fill me-2"></i> +7 (495) 123-45-67</li>
+                        <li><i class="bi bi-envelope-fill me-2"></i> info@automarket.ru</li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Режим работы</h5>
+                    <ul class="list-unstyled">
+                        <li>Пн-Пт: 9:00 - 20:00</li>
+                        <li>Сб-Вс: 10:00 - 18:00</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 АвтоМаркет. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

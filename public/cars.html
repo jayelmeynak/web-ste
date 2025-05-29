@@ -1,0 +1,232 @@
+<!-- public/cars.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Автомобили - АвтоМаркет</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">АвтоМаркет</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="cars.html">Автомобили</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">О компании</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contacts.html">Контакты</a>
+                    </li>
+                </ul>
+                <div class="d-flex" id="auth-buttons">
+                    <a href="login.html" class="btn btn-outline-light me-2">Вход</a>
+                    <a href="register.html" class="btn btn-primary">Регистрация</a>
+                </div>
+                <div class="d-none" id="user-menu">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle me-1"></i> <span id="user-name">Пользователь</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="profile.html">Мой профиль</a></li>
+                            <li><a class="dropdown-item" href="orders.html">Мои заказы</a></li>
+                            <li><a class="dropdown-item" href="test-drives.html">Мои тест-драйвы</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logout-btn">Выйти</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="py-5">
+        <div class="container">
+            <h1 class="mb-4">Каталог автомобилей</h1>
+            
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Фильтры</h5>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <label for="car-make" class="form-label">Марка</label>
+                                    <select class="form-select" id="car-make">
+                                        <option value="">Все марки</option>
+                                        <option value="Toyota">Toyota</option>
+                                        <option value="BMW">BMW</option>
+                                        <option value="Mercedes">Mercedes</option>
+                                        <option value="Hyundai">Hyundai</option>
+                                        <option value="Kia">Kia</option>
+                                        <option value="Volkswagen">Volkswagen</option>
+                                        <option value="Audi">Audi</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="car-type" class="form-label">Тип кузова</label>
+                                    <select class="form-select" id="car-type">
+                                        <option value="">Все типы</option>
+                                        <option value="economy">Эконом</option>
+                                        <option value="comfort">Комфорт</option>
+                                        <option value="premium">Премиум</option>
+                                        <option value="suv">Внедорожник</option>
+                                        <option value="minivan">Минивэн</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="transmission" class="form-label">Коробка передач</label>
+                                    <select class="form-select" id="transmission">
+                                        <option value="">Любая КПП</option>
+                                        <option value="manual">Механическая</option>
+                                        <option value="automatic">Автоматическая</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="fuel-type" class="form-label">Тип топлива</label>
+                                    <select class="form-select" id="fuel-type">
+                                        <option value="">Любое топливо</option>
+                                        <option value="petrol">Бензин</option>
+                                        <option value="diesel">Дизель</option>
+                                        <option value="hybrid">Гибрид</option>
+                                        <option value="electric">Электро</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <label for="min-price" class="form-label">Мин. цена (₽)</label>
+                                    <input type="number" class="form-control" id="min-price" placeholder="От">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="max-price" class="form-label">Макс. цена (₽)</label>
+                                    <input type="number" class="form-control" id="max-price" placeholder="До">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="year" class="form-label">Год выпуска</label>
+                                    <select class="form-select" id="year">
+                                        <option value="">Любой год</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2022">2022</option>
+                                        <option value="2021">2021</option>
+                                        <option value="2020">2020</option>
+                                        <option value="2019">2019</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3 d-flex align-items-end">
+                                    <button class="btn btn-primary w-100" id="apply-filters">Применить фильтры</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row" id="cars-container">
+                <!-- Автомобили будут загружены здесь -->
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
+                    </div>
+                    <p class="mt-2">Загрузка автомобилей...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>АвтоМаркет</h5>
+                    <p>Лучший выбор автомобилей для покупки в вашем городе.</p>
+                    <div class="social-icons">
+                        <a href="#" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-youtube"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-telegram"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Контакты</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-geo-alt-fill me-2"></i> г. Москва, ул. Примерная, 123</li>
+                        <li><i class="bi bi-telephone-fill me-2"></i> +7 (495) 123-45-67</li>
+                        <li><i class="bi bi-envelope-fill me-2"></i> info@automarket.ru</li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Режим работы</h5>
+                    <ul class="list-unstyled">
+                        <li>Пн-Пт: 9:00 - 20:00</li>
+                        <li>Сб-Вс: 10:00 - 18:00</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 АвтоМаркет. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Модальное окно с деталями автомобиля -->
+    <div class="modal fade" id="carDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="carModalTitle">Детали автомобиля</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <img src="" class="img-fluid rounded mb-3" id="carModalImage" alt="Car Image">
+                        </div>
+                        <div class="col-md-6">
+                            <h4 id="carModalName"></h4>
+                            <p id="carModalDescription"></p>
+                            <div class="mb-3">
+                                <span class="badge bg-primary fs-5" id="carModalPrice"></span>
+                            </div>
+                            <ul class="list-unstyled">
+                                <li class="mb-2"><strong>Год выпуска:</strong> <span id="carModalYear"></span></li>
+                                <li class="mb-2"><strong>Тип кузова:</strong> <span id="carModalType"></span></li>
+                                <li class="mb-2"><strong>Коробка передач:</strong> <span id="carModalTransmission"></span></li>
+                                <li class="mb-2"><strong>Количество мест:</strong> <span id="carModalSeats"></span></li>
+                                <li class="mb-2"><strong>Тип топлива:</strong> <span id="carModalFuel"></span></li>
+                                <li class="mb-2"><strong>Пробег:</strong> <span id="carModalMileage"></span> км</li>
+                                <li class="mb-2"><strong>Объем двигателя:</strong> <span id="carModalEngine"></span> л</li>
+                                <li class="mb-2"><strong>Мощность:</strong> <span id="carModalPower"></span> л.с.</li>
+                                <li class="mb-2"><strong>Цвет:</strong> <span id="carModalColor"></span></li>
+                                <li class="mb-2"><strong>VIN:</strong> <span id="carModalVin"></span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <a href="#" class="btn btn-success" id="testDriveBtn">Записаться на тест-драйв</a>
+                    <a href="#" class="btn btn-primary" id="buyCarBtn">Купить</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/cars.js"></script>
+</body>
+</html>

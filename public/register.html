@@ -1,0 +1,182 @@
+<!-- public/register.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - АвтоМаркет</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">АвтоМаркет</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cars.html">Автомобили</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">О компании</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contacts.html">Контакты</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow">
+                        <div class="card-body p-4">
+                            <h1 class="card-title text-center mb-4">Регистрация</h1>
+                            <form id="register-form">
+                                <div class="mb-3">
+                                    <label for="first-name" class="form-label">Имя</label>
+                                    <input type="text" class="form-control" id="first-name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="last-name" class="form-label">Фамилия</label>
+                                    <input type="text" class="form-control" id="last-name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Телефон</label>
+                                    <input type="tel" class="form-control" id="phone" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">Адрес</label>
+                                    <input type="text" class="form-control" id="address">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Пароль</label>
+                                    <input type="password" class="form-control" id="password" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirm-password" class="form-label">Подтвердите пароль</label>
+                                    <input type="password" class="form-control" id="confirm-password" required>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg">Зарегистрироваться</button>
+                                </div>
+                            </form>
+                            <div id="success-message" class="alert alert-success mt-4 d-none" role="alert">
+                                <h4 class="alert-heading">Регистрация успешна!</h4>
+                                <p>Вы успешно зарегистрировались. Теперь вы можете <a href="login.html" class="alert-link">войти</a> в систему.</p>
+                            </div>
+                            <div id="error-message" class="alert alert-danger mt-4 d-none" role="alert">
+                                <h4 class="alert-heading">Ошибка!</h4>
+                                <p>Произошла ошибка при регистрации. Пожалуйста, попробуйте позже.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>АвтоМаркет</h5>
+                    <p>Лучший выбор автомобилей для покупки в вашем городе.</p>
+                    <div class="social-icons">
+                        <a href="#" class="text-white me-2"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white me-2"><i class="bi bi-youtube"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-telegram"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Контакты</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-geo-alt-fill me-2"></i> г. Москва, ул. Примерная, 123</li>
+                        <li><i class="bi bi-telephone-fill me-2"></i> +7 (495) 123-45-67</li>
+                        <li><i class="bi bi-envelope-fill me-2"></i> info@automarket.ru</li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Режим работы</h5>
+                    <ul class="list-unstyled">
+                        <li>Пн-Пт: 9:00 - 20:00</li>
+                        <li>Сб-Вс: 10:00 - 18:00</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 АвтоМаркет. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const registerForm = document.getElementById('register-form');
+            const successMessage = document.getElementById('success-message');
+            const errorMessage = document.getElementById('error-message');
+            
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const firstName = document.getElementById('first-name').value;
+                const lastName = document.getElementById('last-name').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const address = document.getElementById('address').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                if (password !== confirmPassword) {
+                    alert('Пароли не совпадают!');
+                    return;
+                }
+                
+                fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        firstName,
+                        lastName,
+                        email,
+                        phone,
+                        address,
+                        password
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Ошибка регистрации');
+                    return response.json();
+                })
+                .then(data => {
+                    registerForm.classList.add('d-none');
+                    successMessage.classList.remove('d-none');
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    errorMessage.classList.remove('d-none');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

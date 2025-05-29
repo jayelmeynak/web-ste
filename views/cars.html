@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Автопрокат - Автопарк</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Главная</a>
+            <a href="cars.html">Автопарк</a>
+            <a href="booking.html">Аренда</a>
+            <a href="login.html">Вход</a>
+        </nav>
+    </header>
+    
+    <main>
+        <h1>Наш автопарк</h1>
+        
+        <div class="filters">
+            <select id="car-type">
+                <option value="all">Все типы</option>
+                <option value="economy">Эконом</option>
+                <option value="comfort">Комфорт</option>
+                <option value="premium">Премиум</option>
+                <option value="suv">Внедорожник</option>
+            </select>
+            
+            <input type="number" id="price-max" placeholder="Макс. цена в сутки">
+            
+            <button id="apply-filters">Применить</button>
+        </div>
+        
+        <div class="car-list" id="car-list">
+            <!-- Автомобили будут загружаться через JavaScript -->
+        </div>
+    </main>
+    
+    <footer>
+        <p>© 2023 Автопрокат. Все права защищены.</p>
+    </footer>
+    
+    <script src="js/cars.js"></script>
+</body>
+</html>
