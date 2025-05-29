@@ -1,27 +1,79 @@
 const express = require('express');
-const app = express();
+const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 require('dotenv').config();
+
+const app = express();
+const db = new sqlite3.Database('./car_sales.db');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Конфигурация базы данных
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'car_sales'
-};
+// Создание таблицы, если она не существует
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS cars (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    make TEXT,
+    model TEXT,
+    year INTEGER,
+    type TEXT,
+    transmission TEXT,
+    seats INTEGER,
+    doors INTEGER,
+    fuel_type TEXT,
+    mileage INTEGER,
+    price REAL,
+    status TEXT,
+    image_url TEXT,
+    description TEXT,
+    vin TEXT,
+    color TEXT,
+    engine_volume REAL,
+    engine_power INTEGER
+  )`);
 
-// Создание пула соединений с базой данных
-const pool = mysql.createPool(dbConfig);
+  db.run(`CREATE TABLE IF NOT EXISTS clients (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name TEXT,
+    last_name TEXT,
+    email TEXT UNIQUE,
+    phone TEXT,
+    address TEXT,
+    password_hash TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    car_id INTEGER,
+    client_id INTEGER,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_price REAL,
+    status TEXT,
+    delivery_address TEXT,
+    delivery_date DATE,
+    FOREIGN KEY (car_id) REFERENCES cars(id),
+    FOREIGN KEY (client_id) REFERENCES clients(id)
+  )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS test_drives (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    car_id INTEGER,
+    client_id INTEGER,
+    date DATE,
+    time TIME,
+    notes TEXT,
+    FOREIGN KEY (car_id) REFERENCES cars(id),
+    FOREIGN KEY (client_id) REFERENCES clients(id)
+  )`);
+
+  // (Заполнение тестовыми данными отключено, используйте import_cars_from_json.js для импорта)
+});
 
 // Middleware для проверки JWT токена
 const authenticateToken = (req, res, next) => {
@@ -42,276 +94,303 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public', 'index.html'));
 });
 
-// API для получения списка автомобилей
-app.get('/api/cars', async (req, res) => {
-  try {
-    const { type, transmission, maxPrice, minPrice, make, model, year, fuelType } = req.query;
-    
-    let query = 'SELECT * FROM cars WHERE status != "sold"';
-    const params = [];
-    
-    if (type) {
-      query += ' AND type = ?';
-      params.push(type);
-    }
-    
-    if (transmission) {
-      query += ' AND transmission = ?';
-      params.push(transmission);
-    }
-    
-    if (maxPrice) {
-      query += ' AND price <= ?';
-      params.push(parseFloat(maxPrice));
-    }
-    
-    if (minPrice) {
-      query += ' AND price >= ?';
-      params.push(parseFloat(minPrice));
-    }
-    
-    if (make) {
-      query += ' AND make LIKE ?';
-      params.push(`%${make}%`);
-    }
-    
-    if (model) {
-      query += ' AND model LIKE ?';
-      params.push(`%${model}%`);
-    }
-    
-    if (year) {
-      query += ' AND year = ?';
-      params.push(parseInt(year));
-    }
-    
-    if (fuelType) {
-      query += ' AND fuel_type = ?';
-      params.push(fuelType);
-    }
-    
-    const [rows] = await pool.query(query, params);
-    res.json(rows);
-  } catch (error) {
-    console.error('Ошибка при получении автомобилей:', error);
-    res.status(500).json({ error: 'Ошибка сервера' });
+// API для получения списка автомобилей с пагинацией
+app.get('/api/cars', (req, res) => {
+  const { type, transmission, maxPrice, minPrice, make, model, year, fuelType } = req.query;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const offset = (page - 1) * limit;
+
+  let query = 'SELECT * FROM cars WHERE status != "sold"';
+  const params = [];
+
+  if (type) {
+    query += ' AND type = ?';
+    params.push(type);
   }
+  if (transmission) {
+    query += ' AND transmission = ?';
+    params.push(transmission);
+  }
+  if (maxPrice) {
+    query += ' AND price <= ?';
+    params.push(parseFloat(maxPrice));
+  }
+  if (minPrice) {
+    query += ' AND price >= ?';
+    params.push(parseFloat(minPrice));
+  }
+  if (make) {
+    query += ' AND make LIKE ?';
+    params.push(`%${make}%`);
+  }
+  if (model) {
+    query += ' AND model LIKE ?';
+    params.push(`%${model}%`);
+  }
+  if (year) {
+    query += ' AND year = ?';
+    params.push(parseInt(year));
+  }
+  if (fuelType) {
+    query += ' AND fuel_type = ?';
+    params.push(fuelType);
+  }
+
+  // Получи��ь общее количество
+  db.get('SELECT COUNT(*) as count FROM (' + query + ')', params, (err, countRow) => {
+    if (err) {
+      console.error('Ошибка при подсчете автомобилей:', err);
+      res.status(500).json({ error: 'Ошибка сервера' });
+      return;
+    }
+    // Добавить пагинацию
+    query += ' LIMIT ? OFFSET ?';
+    params.push(limit, offset);
+    db.all(query, params, (err, rows) => {
+      if (err) {
+        console.error('Ошибка при получении автомобилей:', err);
+        res.status(500).json({ error: 'Ошибка сервера' });
+        return;
+      }
+      res.json({
+        cars: rows,
+        total: countRow.count,
+        page,
+        limit
+      });
+    });
+  });
 });
 
 // API для получения деталей автомобиля по ID
-app.get('/api/cars/:id', async (req, res) => {
-  try {
-    const [rows] = await pool.query('SELECT * FROM cars WHERE id = ?', [req.params.id]);
-    
-    if (rows.length === 0) {
+app.get('/api/cars/:id', (req, res) => {
+  db.get('SELECT * FROM cars WHERE id = ?', [req.params.id], (err, row) => {
+    if (err) {
+      console.error('Ошибка при получении автомобиля:', err);
+      res.status(500).json({ error: 'Ошибка сервера' });
+      return;
+    }
+    if (!row) {
       return res.status(404).json({ error: 'Автомобиль не найден' });
     }
-    
-    res.json(rows[0]);
-  } catch (error) {
-    console.error('Ошибка при получении автомобиля:', error);
-    res.status(500).json({ error: 'Ошибка сервера' });
-  }
+    res.json(row);
+  });
 });
 
 // API для регистрации пользователя
-app.post('/api/register', async (req, res) => {
-  try {
-    const { firstName, lastName, email, phone, address, password } = req.body;
-    
-    // Проверка, существует ли пользователь с так��м email
-    const [existingUsers] = await pool.query('SELECT * FROM clients WHERE email = ?', [email]);
-    
-    if (existingUsers.length > 0) {
-      return res.status(400).json({ error: 'Пользователь с таким email уже существует' });
+app.post('/api/register', (req, res) => {
+  const { firstName, lastName, email, phone, address, password } = req.body;
+  
+  // Хеширование пароля
+  bcrypt.hash(password, 10, (err, hashedPassword) => {
+    if (err) {
+      console.error('Ошибка при хешировании пароля:', err);
+      res.status(500).json({ error: 'Ошибка сервера' });
+      return;
     }
     
-    // Хеширование пароля
-    const hashedPassword = await bcrypt.hash(password, 10);
-    
     // Добавление пользователя в базу данных
-    const [result] = await pool.query(
+    db.run(
       'INSERT INTO clients (first_name, last_name, email, phone, address, password_hash) VALUES (?, ?, ?, ?, ?, ?)',
-      [firstName, lastName, email, phone, address, hashedPassword]
+      [firstName, lastName, email, phone, address, hashedPassword],
+      function(err) {
+        if (err) {
+          console.error('Ошибка при регистрации:', err);
+          res.status(500).json({ error: 'Ошибка сервера' });
+          return;
+        }
+        
+        // Создание JWT токена
+        const token = jwt.sign(
+          { id: this.lastID, email },
+          process.env.JWT_SECRET || 'your_jwt_secret',
+          { expiresIn: '24h' }
+        );
+        
+        res.status(201).json({ token, userId: this.lastID });
+      }
     );
-    
-    // Создание JWT токена
-    const token = jwt.sign(
-      { id: result.insertId, email },
-      process.env.JWT_SECRET || 'your_jwt_secret',
-      { expiresIn: '24h' }
-    );
-    
-    res.status(201).json({ token, userId: result.insertId });
-  } catch (error) {
-    console.error('Ошибка при регистрации:', error);
-    res.status(500).json({ error: 'Ошибка сервера' });
-  }
+  });
 });
 
 // API для входа пользователя
-app.post('/api/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    
-    // Поиск пользователя по email
-    const [users] = await pool.query('SELECT * FROM clients WHERE email = ?', [email]);
-    
-    if (users.length === 0) {
+app.post('/api/login', (req, res) => {
+  const { email, password } = req.body;
+  
+  // Поиск пользователя по email
+  db.get('SELECT * FROM clients WHERE email = ?', [email], (err, user) => {
+    if (err) {
+      console.error('Ошибка при входе:', err);
+      res.status(500).json({ error: 'Ошибка сервера' });
+      return;
+    }
+    if (!user) {
       return res.status(401).json({ error: 'Неверный email или пароль' });
     }
-    
-    const user = users[0];
     
     // Проверка пароля
-    const passwordMatch = await bcrypt.compare(password, user.password_hash);
-    
-    if (!passwordMatch) {
-      return res.status(401).json({ error: 'Неверный email или пароль' });
-    }
-    
-    // Создание JWT токена
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET || 'your_jwt_secret',
-      { expiresIn: '24h' }
-    );
-    
-    res.json({ token, userId: user.id });
-  } catch (error) {
-    console.error('Ошибка при входе:', error);
-    res.status(500).json({ error: 'Ошибка сервера' });
-  }
+    bcrypt.compare(password, user.password_hash, (err, result) => {
+      if (err || !result) {
+        return res.status(401).json({ error: 'Неверный email или пароль' });
+      }
+      
+      // Создание JWT токена
+      const token = jwt.sign(
+        { id: user.id, email: user.email },
+        process.env.JWT_SECRET || 'your_jwt_secret',
+        { expiresIn: '24h' }
+      );
+      
+      res.json({ token, userId: user.id });
+    });
+  });
 });
 
 // API для создания заказа (покупки автомобиля)
-app.post('/api/orders', authenticateToken, async (req, res) => {
-  try {
-    const { carId, deliveryAddress, deliveryDate } = req.body;
-    const clientId = req.user.id;
-    
-    // Проверка, доступен ли автомобиль для покупки
-    const [cars] = await pool.query('SELECT * FROM cars WHERE id = ? AND status = "available"', [carId]);
-    
-    if (cars.length === 0) {
+app.post('/api/orders', authenticateToken, (req, res) => {
+  const { carId, deliveryAddress, deliveryDate } = req.body;
+  const clientId = req.user.id;
+  
+  // Проверка, доступен ли автомобиль для покупки
+  db.get('SELECT * FROM cars WHERE id = ? AND status = "available"', [carId], (err, car) => {
+    if (err) {
+      console.error('Ошибка при создании заказа:', err);
+      res.status(500).json({ error: 'Ошибка се��вера' });
+      return;
+    }
+    if (!car) {
       return res.status(400).json({ error: 'Автомобиль недоступен для покупки' });
     }
     
-    const car = cars[0];
-    
     // Создание заказа
-    const [result] = await pool.query(
+    db.run(
       'INSERT INTO orders (car_id, client_id, total_price, delivery_address, delivery_date) VALUES (?, ?, ?, ?, ?)',
-      [carId, clientId, car.price, deliveryAddress, deliveryDate]
+      [carId, clientId, car.price, deliveryAddress, deliveryDate],
+      function(err) {
+        if (err) {
+          console.error('Ошибка при создании заказа:', err);
+          res.status(500).json({ error: 'Ошибка сервера' });
+          return;
+        }
+        
+        // Обновление статуса автомобиля
+        db.run('UPDATE cars SET status = "reserved" WHERE id = ?', [carId], (err) => {
+          if (err) {
+            console.error('Ошибка при обновлении статуса автомобиля:', err);
+            res.status(500).json({ error: 'Ошибка сервера' });
+            return;
+          }
+          res.status(201).json({ orderId: this.lastID });
+        });
+      }
     );
-    
-    // Обновление статуса автомобиля
-    await pool.query('UPDATE cars SET status = "reserved" WHERE id = ?', [carId]);
-    
-    res.status(201).json({ orderId: result.insertId });
-  } catch (error) {
-    console.error('Ошибка при создании заказа:', error);
-    res.status(500).json({ error: 'Ошибка сервера' });
-  }
+  });
 });
 
 // API для записи на тест-драйв
-app.post('/api/test-drives', authenticateToken, async (req, res) => {
-  try {
-    const { carId, date, time, notes } = req.body;
-    const clientId = req.user.id;
-    
-    // Проверка, существует ли автомобиль
-    const [cars] = await pool.query('SELECT * FROM cars WHERE id = ?', [carId]);
-    
-    if (cars.length === 0) {
+app.post('/api/test-drives', authenticateToken, (req, res) => {
+  const { carId, date, time, notes } = req.body;
+  const clientId = req.user.id;
+  
+  // Проверка, существует ли автомобиль
+  db.get('SELECT * FROM cars WHERE id = ?', [carId], (err, car) => {
+    if (err) {
+      console.error('Ошибка при записи на тест-драйв:', err);
+      res.status(500).json({ error: 'Ошибка сервера' });
+      return;
+    }
+    if (!car) {
       return res.status(404).json({ error: 'Автомобиль не найден' });
     }
     
     // Создание записи на тест-драйв
-    const [result] = await pool.query(
+    db.run(
       'INSERT INTO test_drives (car_id, client_id, date, time, notes) VALUES (?, ?, ?, ?, ?)',
-      [carId, clientId, date, time, notes]
+      [carId, clientId, date, time, notes],
+      function(err) {
+        if (err) {
+          console.error('Ошибка при записи на тест-драйв:', err);
+          res.status(500).json({ error: 'Ошибка сервера' });
+          return;
+        }
+        res.status(201).json({ testDriveId: this.lastID });
+      }
     );
-    
-    res.status(201).json({ testDriveId: result.insertId });
-  } catch (error) {
-    console.error('Ошибка при записи на тест-драйв:', error);
-    res.status(500).json({ error: 'Ошибка сервера' });
-  }
+  });
 });
 
 // API для получения заказов пользователя
-app.get('/api/orders', authenticateToken, async (req, res) => {
-  try {
-    const clientId = req.user.id;
-    
-    const [rows] = await pool.query(`
-      SELECT o.*, c.make, c.model, c.year, c.image_url 
-      FROM orders o 
-      JOIN cars c ON o.car_id = c.id 
-      WHERE o.client_id = ?
-      ORDER BY o.order_date DESC
-    `, [clientId]);
-    
+app.get('/api/orders', authenticateToken, (req, res) => {
+  const clientId = req.user.id;
+  
+  db.all(`
+    SELECT o.*, c.make, c.model, c.year, c.image_url 
+    FROM orders o 
+    JOIN cars c ON o.car_id = c.id 
+    WHERE o.client_id = ?
+    ORDER BY o.order_date DESC
+  `, [clientId], (err, rows) => {
+    if (err) {
+      console.error('Ошибка при получении заказов:', err);
+      res.status(500).json({ error: 'Ошибка сервера' });
+      return;
+    }
     res.json(rows);
-  } catch (error) {
-    console.error('Ошибка при получении заказов:', error);
-    res.status(500).json({ error: 'Ошибка сервера' });
-  }
+  });
 });
 
 // API для получения тест-драйвов пользователя
-app.get('/api/test-drives', authenticateToken, async (req, res) => {
-  try {
-    const clientId = req.user.id;
-    
-    const [rows] = await pool.query(`
-      SELECT td.*, c.make, c.model, c.year, c.image_url 
-      FROM test_drives td 
-      JOIN cars c ON td.car_id = c.id 
-      WHERE td.client_id = ?
-      ORDER BY td.date, td.time
-    `, [clientId]);
-    
+app.get('/api/test-drives', authenticateToken, (req, res) => {
+  const clientId = req.user.id;
+  
+  db.all(`
+    SELECT td.*, c.make, c.model, c.year, c.image_url 
+    FROM test_drives td 
+    JOIN cars c ON td.car_id = c.id 
+    WHERE td.client_id = ?
+    ORDER BY td.date, td.time
+  `, [clientId], (err, rows) => {
+    if (err) {
+      console.error('Ошибка при получении тест-драйвов:', err);
+      res.status(500).json({ error: 'Ошибка сервера' });
+      return;
+    }
     res.json(rows);
-  } catch (error) {
-    console.error('Ошибка при получении тест-драйвов:', error);
-    res.status(500).json({ error: 'Ошибка сервера' });
-  }
+  });
 });
 
 // API для получения профиля пользователя
-app.get('/api/profile', authenticateToken, async (req, res) => {
-  try {
-    const [rows] = await pool.query('SELECT id, first_name, last_name, email, phone, address, created_at FROM clients WHERE id = ?', [req.user.id]);
-    
-    if (rows.length === 0) {
+app.get('/api/profile', authenticateToken, (req, res) => {
+  db.get('SELECT id, first_name, last_name, email, phone, address, created_at FROM clients WHERE id = ?', [req.user.id], (err, row) => {
+    if (err) {
+      console.error('Ошибка при получении профиля:', err);
+      res.status(500).json({ error: 'Ошибка сервера' });
+      return;
+    }
+    if (!row) {
       return res.status(404).json({ error: 'Пользователь не найден' });
     }
-    
-    res.json(rows[0]);
-  } catch (error) {
-    console.error('Ошибка при получении профиля:', error);
-    res.status(500).json({ error: 'Ошибка сервера' });
-  }
+    res.json(row);
+  });
 });
 
 // API для обновления профиля пользователя
-app.put('/api/profile', authenticateToken, async (req, res) => {
-  try {
-    const { firstName, lastName, phone, address } = req.body;
-    
-    await pool.query(
-      'UPDATE clients SET first_name = ?, last_name = ?, phone = ?, address = ? WHERE id = ?',
-      [firstName, lastName, phone, address, req.user.id]
-    );
-    
-    res.json({ message: 'Профиль успешно обновлен' });
-  } catch (error) {
-    console.error('Ошибка при обновлении профиля:', error);
-    res.status(500).json({ error: 'Ошибка сервера' });
-  }
+app.put('/api/profile', authenticateToken, (req, res) => {
+  const { firstName, lastName, phone, address } = req.body;
+  
+  db.run(
+    'UPDATE clients SET first_name = ?, last_name = ?, phone = ?, address = ? WHERE id = ?',
+    [firstName, lastName, phone, address, req.user.id],
+    function(err) {
+      if (err) {
+        console.error('Ошибка при обновлении профиля:', err);
+        res.status(500).json({ error: 'Ошибка сервера' });
+        return;
+      }
+      res.json({ message: 'Профиль успешно обновлен' });
+    }
+  );
 });
 
 // Запуск сервера
