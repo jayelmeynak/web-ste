@@ -23,18 +23,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     makeSelect.innerHTML += `<option value="${make}">${make}</option>`;
                 });
 
+                // Модели
+                const modelSelect = document.getElementById('car-model');
+                modelSelect.innerHTML = '<option value="">Все модели</option>';
+                data.models.forEach(model => {
+                    modelSelect.innerHTML += `<option value="${model}">${model}</option>`;
+                });
+
                 // Типы кузова
                 const typeSelect = document.getElementById('car-type');
                 typeSelect.innerHTML = '<option value="">Все типы</option>';
                 data.types.forEach(type => {
                     typeSelect.innerHTML += `<option value="${type}">${type}</option>`;
-                });
-
-                // Коробка передач
-                const transmissionSelect = document.getElementById('transmission');
-                transmissionSelect.innerHTML = '<option value="">Любая КПП</option>';
-                data.transmissions.forEach(tr => {
-                    transmissionSelect.innerHTML += `<option value="${tr}">${tr === 'automatic' ? 'Автоматическая' : 'Механическая'}</option>`;
                 });
 
                 // Годы выпуска
@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Начальная загрузка
     checkAuth();
-    loadFilterOptions
+    loadFilterOptions();
     loadCars();
     
     // Проверка, нужно ли показать конкретный автомобиль (из параметра URL)
